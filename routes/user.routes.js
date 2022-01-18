@@ -32,7 +32,7 @@ router.post('/', [
     check('password', 'La contraseña debe tener minimo 6 caracteres.').isLength({ min: 6 }),
     check('correo', 'El correo no es valido').isEmail(),
     check('correo').custom(existeEmail),
-    // check('role', 'No es un rol valido.').isIn(['ADMIN_ROLE','USER_ROLE']),
+    check('role', 'No es un rol valido.').isIn(['ADMIN_ROLE','USER_ROLE']),
     check('role').custom(esRoleValido),
     validarCampos
 ], usersPost);
@@ -48,7 +48,7 @@ router.patch('/', usersPatch);
 
 router.delete('/:id', [
     validarJWT,
-    //esAdminRole,
+    esAdminRole,
     tieneRole('ADMIN_ROLE', 'VENTAS_ROLE'),
     check('id', 'No es un id de mongo valido.').isMongoId(),
     check('id').custom(existeUsuarioPorId),

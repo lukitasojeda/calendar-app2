@@ -6,15 +6,21 @@ const { crearEvento,
         obtenerEventoById,
         actualizarEvento,
         eliminarEvento} = require('../controllers/eventos.controller');
+
 const { existeEvento } = require('../helpers/existe-evento');
 
-// const { validarJWT, 
-//         esAdminRole} = require('../middlewares');
+const { isDate } = require('../helpers/isDate');
+
+const { validarJWT, 
+        esAdminRole} = require('../middlewares');
 
 const { validarCampos } = require('../middlewares/validar-campos.mw');
 
 
 const router = Router();
+
+// Todas tienen que pasar por la validacion del jwt
+router.use( validarJWT );
 
 //Obtener todas las categorias - publico
 router.get('/', obtenerListadoEventos)
@@ -28,17 +34,17 @@ router.get('/:id',[
 
 //Crear una nueva categoria - privado - cualquier persona con un token valido (cualquier rol)
 router.post('/', [
-//     validarJWT,
+    esAdminRole,
     check('title', 'title es obligatorio.').not().isEmpty(),
-    check('startDate', 'startDate es obligatorio.').not().isEmpty(),
-    check('endDate', 'endDate es obligatoria.').not().isEmpty(),
+    check('startDate', 'startDate es obligatorio.').custom( isDate ),
+    check('endDate', 'endDate es obligatoria.').custom( isDate ),
     check('user', 'El id del usuario es obligatorio / No es un id de mongo valido.').isMongoId(),
     validarCampos 
 ], crearEvento);
 
 //Actualizar una categoria - privado - cualqueira con token valido
 router.put('/:id',[
-    // validarJWT,
+    esAdminRole,
     check('id', 'No es un id de mongo valido.').isMongoId(),
     check('id').custom( existeEvento ),
     validarCampos
@@ -46,8 +52,7 @@ router.put('/:id',[
 
 //Borrar una categoria (Poner banderin) - privado - administrador
 router.delete('/:id',[
-    // validarJWT,
-    // esAdminRole,
+    esAdminRole,
     check('id', 'No es un id de mongo valido.').isMongoId(),
     check('id').custom( existeEvento ),
     validarCampos

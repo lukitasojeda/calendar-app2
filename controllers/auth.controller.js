@@ -111,6 +111,18 @@ const googleSignInController = async (req, res = response) => {
     }
 }
 
+const revalidarToken = async (req, res = response ) => {
+
+    const { uid, name } = req.user;
+
+    // Generar JWT
+    const token = await generarJWT( uid, name );
+
+    res.json({
+        ok: true,
+        token
+    })
+}
 
 
 
@@ -120,5 +132,6 @@ const googleSignInController = async (req, res = response) => {
 
 module.exports = {
     loginController,
-    googleSignInController
+    googleSignInController,
+    revalidarToken
 }

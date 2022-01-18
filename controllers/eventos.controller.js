@@ -5,7 +5,8 @@ const obtenerListadoEventos = async (req, res = response) => {
     const query = { status: true };
 
     const [total, eventos] = await Promise.all([
-        Evento.countDocuments(query),
+        Evento.countDocuments(query)
+            .populate('user', 'name'),
         Evento.find(query)
             .skip(Number(desde))
             .limit(Number(limite))
@@ -71,43 +72,34 @@ const obtenerEventoById = async (req, res = response) => {
 
 const actualizarEvento = async (req, res = response) => {
     const { id } = req.params;
+
+    const uid = req.uid;
     
     
     try {
         const evento = await Evento.findById(id)
 
-         
-        const { 
-
-            title = evento.title,
-            nota = evento.nota,
-            startDate = evento.startDate,
-            endDate = evento.endDate,
-            img = evento.img,
-            user = evento.user
-
-        } = req.body;
-        
-            
-        
         if ( !evento ) {
             return res.status(400).json({
                 msg: `El evento con el id ${id} no existe`
             });
         }
+
+        if ( evento.user.toString() !== uid ) {
+            return res.status(401).json({
+                msg: `Este usuario no está autorizado`
+            });
+        }
+         
         
         //Generar la data a guardar
-        const data = {
-            title,
-            nota,
-            startDate,
-            endDate,
-            img,
-            user,
+        const newData = {
+            ...req.body,
+            user: uid
         }
        
         //Actualizar en DB
-        const eventoFinish = await Evento.findByIdAndUpdate(id, data, {new: true})
+        const eventoFinish = await Evento.findByIdAndUpdate(id, newData, {new: true})
         res.status(201).json({
             msg: eventoFinish
         })
@@ -122,13 +114,41 @@ const actualizarEvento = async (req, res = response) => {
 }
 
 const eliminarEvento = async (req, res = response) => {
-    const id = req.params.id;
-    const evento = await Evento.findByIdAndUpdate(id, { status: false }, {new: true})
+    const { id } = req.params;
+
+    const uid = req.uid;
+    
+    
+    try {
+        const evento = await Evento.findById(id)
+
+        if ( !evento ) {
+            return res.status(400).json({
+                msg: `El evento con el id ${id} no existe`
+            });
+        }
+
+        if ( evento.user.toString() !== uid ) {
+            return res.status(401).json({
+                msg: `Este usuario no está autorizado`
+            });
+        }
+         
+
+    const eventoDB = await Evento.findByIdAndUpdate(id, { status: false }, {new: true})
 
     res.status(200).json({
         msg: 'Evento eliminado exitosamente',
-        evento
+        eventoDB
     })
+
+    } catch (error) {
+        res.status(401).json({
+            msg: 'No se pudo procesar el evento'
+        })
+        console.log(error)
+
+    }
 }
 
 module.exports = {
