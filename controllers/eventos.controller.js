@@ -1,15 +1,16 @@
 const { Evento } = require("../models");
+const user = require("../models/user");
 
 const obtenerListadoEventos = async (req, res = response) => {
-    const { limite = 5, desde = 0 } = req.query;
+    // const { limite = 5, desde = 0 } = req.query;
     const query = { status: true };
 
     const [total, eventos] = await Promise.all([
         Evento.countDocuments(query)
             .populate('user', 'name'),
         Evento.find(query)
-            .skip(Number(desde))
-            .limit(Number(limite))
+            // .skip(Number(desde))
+            // .limit(Number(limite))
     ]);
 
 
@@ -24,7 +25,7 @@ const obtenerListadoEventos = async (req, res = response) => {
 
 const crearEvento = async(req, res = response) => {
     const { body } = req;
-    const { title, nota, startDate, endDate, user} = body;
+    const { title, nota, start, end, user} = body;
 
 
     try {
@@ -33,8 +34,8 @@ const crearEvento = async(req, res = response) => {
         const data = {
             title,
             nota,
-            startDate,
-            endDate,
+            start,
+            end,
             user
         }
        
@@ -73,8 +74,7 @@ const obtenerEventoById = async (req, res = response) => {
 const actualizarEvento = async (req, res = response) => {
     const { id } = req.params;
 
-    const uid = req.uid;
-    
+    const uuid = req.body.uid;
     
     try {
         const evento = await Evento.findById(id)
@@ -85,7 +85,7 @@ const actualizarEvento = async (req, res = response) => {
             });
         }
 
-        if ( evento.user.toString() !== uid ) {
+        if ( evento.user.uid.toString() !== uuid ) {
             return res.status(401).json({
                 msg: `Este usuario no está autorizado`
             });
@@ -94,9 +94,9 @@ const actualizarEvento = async (req, res = response) => {
         
         //Generar la data a guardar
         const newData = {
-            ...req.body,
-            user: uid
+            ...req.body.event
         }
+
        
         //Actualizar en DB
         const eventoFinish = await Evento.findByIdAndUpdate(id, newData, {new: true})
@@ -116,8 +116,7 @@ const actualizarEvento = async (req, res = response) => {
 const eliminarEvento = async (req, res = response) => {
     const { id } = req.params;
 
-    const uid = req.uid;
-    
+    const uuid = req.body.uid;
     
     try {
         const evento = await Evento.findById(id)
@@ -128,7 +127,7 @@ const eliminarEvento = async (req, res = response) => {
             });
         }
 
-        if ( evento.user.toString() !== uid ) {
+        if ( evento.user.uid.toString() !== uuid ) {
             return res.status(401).json({
                 msg: `Este usuario no está autorizado`
             });
@@ -138,7 +137,7 @@ const eliminarEvento = async (req, res = response) => {
     const eventoDB = await Evento.findByIdAndUpdate(id, { status: false }, {new: true})
 
     res.status(200).json({
-        msg: 'Evento eliminado exitosamente',
+        msg: 'Todo ok',
         eventoDB
     })
 

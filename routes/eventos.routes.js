@@ -36,9 +36,9 @@ router.get('/:id',[
 router.post('/', [
     esAdminRole,
     check('title', 'title es obligatorio.').not().isEmpty(),
-    check('startDate', 'startDate es obligatorio.').custom( isDate ),
-    check('endDate', 'endDate es obligatoria.').custom( isDate ),
-    check('user', 'El id del usuario es obligatorio / No es un id de mongo valido.').isMongoId(),
+    check('start', 'start es obligatorio.').custom( isDate ),
+    check('end', 'end es obligatoria.').custom( isDate ),
+    check('user', 'El id del usuario es obligatorio / No es un id de mongo valido.').not().isEmpty(),
     validarCampos 
 ], crearEvento);
 

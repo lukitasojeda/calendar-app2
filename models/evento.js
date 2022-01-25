@@ -7,15 +7,14 @@ const eventoSchema = Schema({
         type: String,
         required: [true, 'El titulo es obligatorio.']
     },
-    nota: { 
-        type: String,
-        required: [true, 'La nota es obligatoria'] 
+    notes: { 
+        type: String
     },
-    startDate: { 
+    start: { 
         type: Date,
         required: [true, 'La fecha de inicio es obligatoria'] 
     },
-    endDate: { 
+    end: { 
         type: Date,
         required: [true, 'La fecha de finalizacion es obligatoria'] 
     },
@@ -23,13 +22,18 @@ const eventoSchema = Schema({
         type: Boolean,
         default: true,
     }, 
-    img: { 
-        type: String 
-    },
     user: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: [true, 'El id de mongo del usuario que crea el evento es obligatorio'] 
+        type: Object,
+        required: [true, 'El user que crea el evento es obligatorio'],
+        uid: {
+            type: Schema.Types.ObjectId,
+            required: [true, 'El id de mongo del usuario que crea el evento es obligatorio'] 
+        },
+        name: {
+            type: String,
+            required: [true, 'El name del usuario que crea el evento es obligatorio'] 
+        },
+        
     },
 });
 

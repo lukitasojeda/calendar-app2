@@ -13,9 +13,8 @@ const isDate = ( value, { req, location, path } ) => {
     } else {
         return false;
     }
-
 }
 
 module.exports = {
     isDate
-}
+} 

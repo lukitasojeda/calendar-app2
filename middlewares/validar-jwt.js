@@ -16,10 +16,14 @@ const validarJWT = async( req = request, res = response, next ) => {
     try {
 
         const { id } = jwt.verify( token, process.env.SECRETORPRIVATEKEY ); 
-        
-        req.id = id;
 
+        
+        
         user = await User.findById( id );
+        
+        req.id = id; 
+        
+        // console.log('validar-jwt: ',req.id);
 
         req.user = user;
 

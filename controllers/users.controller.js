@@ -3,6 +3,7 @@ const { response,
 
 const bcrypt = require('bcryptjs');
 
+const { generarJWT } = require('../helpers/generar-jwt');
 const User = require('../models/user');
 
 
@@ -38,12 +39,16 @@ const usersPost = async (req, res = response) => {
     const salt = bcrypt.genSaltSync();
     user.password = bcrypt.hashSync(password, salt);
 
+    //Generar el JWT
+    const { id } = user;
+    const token = await generarJWT(id)
+
     //Guardar en la base de datos
     await user.save();
 
     res.json({
-        value: 'Post api - Controller',
-        user
+        user,
+        token
     })
 };
 
